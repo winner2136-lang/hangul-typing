@@ -1,490 +1,959 @@
 <!DOCTYPE html>
+
 <html lang="ko">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>웹 한글 타자 연습</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
+
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
     body { font-family: 'Pretendard', sans-serif; user-select: none; }
+
     .key-active { transform: translateY(2px); background-color: #3b82f6 !important; color: white !important; }
+
     .key-target { animation: pulse 1s infinite alternate; border: 2px solid #3b82f6 !important; }
+
     @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.05); box-shadow: 0 0 10px rgba(59,130,246,0.5); } }
+
     .finger-active { transform: translateY(8px) scale(0.96); filter: drop-shadow(0 0 8px #3b82f6); }
+
     .rain-word { position: absolute; font-weight: bold; padding: 4px 8px; background: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
   </style>
+
 </head>
+
 <body class="bg-slate-50 min-h-screen flex flex-col justify-between text-slate-800">
+
   <!-- Header -->
+
   <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
+
     <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+
       ⌨️ 한글 타자 연습
+
     </h1>
+
     <div class="flex items-center gap-4">
+
       <button id="toggle-hands-btn" class="px-3 py-1.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+
         손 윤곽선 표시: ON
+
       </button>
+
       <button id="sound-btn" class="px-3 py-1.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+
         🔊 소리: ON
+
       </button>
+
     </div>
+
   </header>
 
+
+
   <!-- Main Container -->
+
   <main class="max-w-4xl w-full mx-auto p-4 flex-1 flex flex-col gap-4">
+
     <!-- Mode Navigation -->
+
     <nav class="flex justify-center bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm gap-1">
+
       <button data-mode="pos" class="nav-btn px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white shadow-sm">자리 연습</button>
+
       <button data-mode="word" class="nav-btn px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-100 text-slate-600">낱말 연습</button>
+
       <button data-mode="short" class="nav-btn px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-100 text-slate-600">단문 연습</button>
+
       <button data-mode="long" class="nav-btn px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-100 text-slate-600">긴글 연습</button>
+
       <button data-mode="game" class="nav-btn px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-100 text-slate-600">산성비 게임</button>
+
     </nav>
 
+
+
     <!-- Sub Menu for Sub-positions -->
+
     <div id="sub-pos-menu" class="flex justify-center gap-2">
+
       <button data-pos="home" class="pos-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-200 text-slate-700">기본 자리</button>
+
       <button data-pos="top" class="pos-btn px-3 py-1 text-xs font-medium rounded-full hover:bg-slate-200 text-slate-600">윗글자</button>
+
       <button data-pos="bottom" class="pos-btn px-3 py-1 text-xs font-medium rounded-full hover:bg-slate-200 text-slate-600">아랫글자</button>
+
       <button data-pos="double" class="pos-btn px-3 py-1 text-xs font-medium rounded-full hover:bg-slate-200 text-slate-600">쌍자음/단모음</button>
+
     </div>
+
+
 
     <!-- Stats Bar -->
+
     <div class="grid grid-cols-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center text-sm">
+
       <div>현재 타수: <span id="cpm" class="font-bold text-blue-600">0</span> 타/분</div>
+
       <div>최고 타수: <span id="max-cpm" class="font-bold text-purple-600">0</span> 타/분</div>
+
       <div>정확도: <span id="acc" class="font-bold text-emerald-600">100</span> %</div>
+
     </div>
+
+
 
     <!-- Practice / Display Board -->
+
     <div id="display-card" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col items-center justify-center min-h-[220px] relative overflow-hidden">
+
       <!-- Standard Practice UI -->
+
       <div id="standard-practice" class="w-full flex flex-col items-center gap-4">
-        <div id="target-text" class="text-4xl font-bold tracking-widest text-slate-700 min-h-[50px] flex items-center justify-center"></div>
+
+        <div id="target-text" class="text-4xl font-bold tracking-widest text-slate-700 min-h-[50px] flex items-center justify-center select-none"></div>
+
         <div id="target-guide" class="text-xs text-slate-400">가상 키보드 위 투명 손가락 오버랩을 참고하여 타자하세요</div>
-        <input type="text" id="type-input" autocomplete="off" class="w-full max-w-xl text-2xl px-4 py-2 border-b-2 border-blue-500 text-center outline-none bg-transparent" placeholder="여기에 입력하세요">
+
+        <input type="text" id="type-input" autocomplete="off" spellcheck="false" class="w-full max-w-xl text-2xl font-bold px-4 py-2 border-b-2 border-blue-500 text-center outline-none bg-slate-50 text-slate-900 rounded-t-lg shadow-inner" placeholder="여기에 입력하세요">
+
       </div>
+
+
 
       <!-- Rain Game Container -->
+
       <div id="game-container" class="w-full h-[250px] relative hidden">
-        <div id="game-canvas" class="w-full h-full relative overflow-hidden"></div>
+
+        <div id="game-canvas" class="w-full h-full relative overflow-hidden bg-slate-900 rounded-xl"></div>
+
         <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 w-full max-w-md px-4">
-          <input type="text" id="game-input" autocomplete="off" class="w-full px-4 py-2 border rounded-xl shadow-sm outline-none border-blue-400" placeholder="단어를 입력하고 Enter">
+
+          <input type="text" id="game-input" autocomplete="off" spellcheck="false" class="w-full px-4 py-2 border rounded-xl shadow-sm outline-none border-blue-400 bg-white text-slate-900 font-bold text-center" placeholder="단어를 입력하고 Enter">
+
         </div>
+
       </div>
+
     </div>
+
+
 
     <!-- Keyboard & Hands Visual Section -->
+
     <div class="relative bg-white p-4 rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-h-[260px] flex items-center justify-center">
+
       <!-- Keyboard UI -->
+
       <div id="keyboard" class="w-full max-w-3xl flex flex-col gap-1.5 text-xs font-semibold select-none relative z-10">
+
         <!-- Row 1 -->
+
         <div class="flex gap-1 justify-center">
+
           <div data-key="`" class="key w-10 h-10 rounded-lg border bg-rose-50 flex items-center justify-center">`</div>
+
           <div data-key="1" class="key w-10 h-10 rounded-lg border bg-rose-50 flex items-center justify-center">1</div>
+
           <div data-key="2" class="key w-10 h-10 rounded-lg border bg-orange-50 flex items-center justify-center">2</div>
+
           <div data-key="3" class="key w-10 h-10 rounded-lg border bg-amber-50 flex items-center justify-center">3</div>
+
           <div data-key="4" class="key w-10 h-10 rounded-lg border bg-emerald-50 flex items-center justify-center">4</div>
+
           <div data-key="5" class="key w-10 h-10 rounded-lg border bg-emerald-50 flex items-center justify-center">5</div>
+
           <div data-key="6" class="key w-10 h-10 rounded-lg border bg-cyan-50 flex items-center justify-center">6</div>
+
           <div data-key="7" class="key w-10 h-10 rounded-lg border bg-cyan-50 flex items-center justify-center">7</div>
+
           <div data-key="8" class="key w-10 h-10 rounded-lg border bg-sky-50 flex items-center justify-center">8</div>
+
           <div data-key="9" class="key w-10 h-10 rounded-lg border bg-indigo-50 flex items-center justify-center">9</div>
+
           <div data-key="0" class="key w-10 h-10 rounded-lg border bg-purple-50 flex items-center justify-center">0</div>
+
           <div data-key="-" class="key w-10 h-10 rounded-lg border bg-purple-50 flex items-center justify-center">-</div>
+
           <div data-key="=" class="key w-10 h-10 rounded-lg border bg-purple-50 flex items-center justify-center">=</div>
+
           <div data-key="Backspace" class="key w-16 h-10 rounded-lg border bg-slate-100 flex items-center justify-center text-[10px]">Bksp</div>
+
         </div>
+
         <!-- Row 2 -->
+
         <div class="flex gap-1 justify-center">
+
           <div data-key="Tab" class="key w-14 h-10 rounded-lg border bg-slate-100 flex items-center justify-center text-[10px]">Tab</div>
+
           <div data-key="q" data-ko="ㅂ" class="key w-10 h-10 rounded-lg border bg-rose-50 flex flex-col items-center justify-center"><span>ㅃ</span><span>ㅂ</span></div>
+
           <div data-key="w" data-ko="ㅈ" class="key w-10 h-10 rounded-lg border bg-orange-50 flex flex-col items-center justify-center"><span>ㅉ</span><span>ㅈ</span></div>
+
           <div data-key="e" data-ko="ㄷ" class="key w-10 h-10 rounded-lg border bg-amber-50 flex flex-col items-center justify-center"><span>ㄸ</span><span>ㄷ</span></div>
+
           <div data-key="r" data-ko="ㄱ" class="key w-10 h-10 rounded-lg border bg-emerald-50 flex flex-col items-center justify-center"><span>ㄲ</span><span>ㄱ</span></div>
+
           <div data-key="t" data-ko="ㅅ" class="key w-10 h-10 rounded-lg border bg-emerald-50 flex flex-col items-center justify-center"><span>ㅆ</span><span>ㅅ</span></div>
+
           <div data-key="y" data-ko="ㅛ" class="key w-10 h-10 rounded-lg border bg-cyan-50 flex items-center justify-center">ㅛ</div>
+
           <div data-key="u" data-ko="ㅕ" class="key w-10 h-10 rounded-lg border bg-cyan-50 flex items-center justify-center">ㅕ</div>
+
           <div data-key="i" data-ko="ㅑ" class="key w-10 h-10 rounded-lg border bg-sky-50 flex items-center justify-center">ㅑ</div>
+
           <div data-key="o" data-ko="ㅐ" class="key w-10 h-10 rounded-lg border bg-indigo-50 flex flex-col items-center justify-center"><span>ㅒ</span><span>ㅐ</span></div>
+
           <div data-key="p" data-ko="ㅔ" class="key w-10 h-10 rounded-lg border bg-purple-50 flex flex-col items-center justify-center"><span>ㅖ</span><span>ㅔ</span></div>
+
           <div data-key="[" class="key w-10 h-10 rounded-lg border bg-purple-50 flex items-center justify-center">[</div>
+
           <div data-key="]" class="key w-10 h-10 rounded-lg border bg-purple-50 flex items-center justify-center">]</div>
+
         </div>
+
         <!-- Row 3 -->
+
         <div class="flex gap-1 justify-center">
+
           <div data-key="CapsLock" class="key w-16 h-10 rounded-lg border bg-slate-100 flex items-center justify-center text-[10px]">Caps</div>
+
           <div data-key="a" data-ko="ㅁ" class="key w-10 h-10 rounded-lg border bg-rose-100 font-bold flex items-center justify-center">ㅁ</div>
+
           <div data-key="s" data-ko="ㄴ" class="key w-10 h-10 rounded-lg border bg-orange-100 font-bold flex items-center justify-center">ㄴ</div>
+
           <div data-key="d" data-ko="ㅇ" class="key w-10 h-10 rounded-lg border bg-amber-100 font-bold flex items-center justify-center">ㅇ</div>
+
           <div data-key="f" data-ko="ㄹ" class="key w-10 h-10 rounded-lg border bg-emerald-100 font-bold flex items-center justify-center relative">ㄹ<span class="absolute bottom-0.5 w-1 h-1 bg-slate-400 rounded-full"></span></div>
+
           <div data-key="g" data-ko="ㅎ" class="key w-10 h-10 rounded-lg border bg-emerald-50 flex items-center justify-center">ㅎ</div>
+
           <div data-key="h" data-ko="ㅗ" class="key w-10 h-10 rounded-lg border bg-cyan-50 flex items-center justify-center">ㅗ</div>
+
           <div data-key="j" data-ko="ㅓ" class="key w-10 h-10 rounded-lg border bg-cyan-100 font-bold flex items-center justify-center relative">ㅓ<span class="absolute bottom-0.5 w-1 h-1 bg-slate-400 rounded-full"></span></div>
+
           <div data-key="k" data-ko="ㅏ" class="key w-10 h-10 rounded-lg border bg-sky-100 font-bold flex items-center justify-center">ㅏ</div>
+
           <div data-key="l" data-ko="ㅣ" class="key w-10 h-10 rounded-lg border bg-indigo-100 font-bold flex items-center justify-center">ㅣ</div>
+
           <div data-key=";" data-ko=";" class="key w-10 h-10 rounded-lg border bg-purple-100 font-bold flex items-center justify-center">;</div>
+
           <div data-key="'" class="key w-10 h-10 rounded-lg border bg-purple-50 flex items-center justify-center">'</div>
+
           <div data-key="Enter" class="key w-20 h-10 rounded-lg border bg-purple-100 flex items-center justify-center text-[10px]">Enter</div>
+
         </div>
+
         <!-- Row 4 -->
+
         <div class="flex gap-1 justify-center">
+
           <div data-key="Shift" class="key w-20 h-10 rounded-lg border bg-slate-100 flex items-center justify-center text-[10px]">Shift</div>
+
           <div data-key="z" data-ko="ㅋ" class="key w-10 h-10 rounded-lg border bg-rose-50 flex items-center justify-center">ㅋ</div>
+
           <div data-key="x" data-ko="ㅌ" class="key w-10 h-10 rounded-lg border bg-orange-50 flex items-center justify-center">ㅌ</div>
+
           <div data-key="c" data-ko="ㅊ" class="key w-10 h-10 rounded-lg border bg-amber-50 flex items-center justify-center">ㅊ</div>
+
           <div data-key="v" data-ko="ㅍ" class="key w-10 h-10 rounded-lg border bg-emerald-50 flex items-center justify-center">ㅍ</div>
+
           <div data-key="b" data-ko="ㅠ" class="key w-10 h-10 rounded-lg border bg-emerald-50 flex items-center justify-center">ㅠ</div>
+
           <div data-key="n" data-ko="ㅜ" class="key w-10 h-10 rounded-lg border bg-cyan-50 flex items-center justify-center">ㅜ</div>
+
           <div data-key="m" data-ko="ㅡ" class="key w-10 h-10 rounded-lg border bg-cyan-50 flex items-center justify-center">ㅡ</div>
+
           <div data-key="," class="key w-10 h-10 rounded-lg border bg-sky-50 flex items-center justify-center">,</div>
+
           <div data-key="." class="key w-10 h-10 rounded-lg border bg-indigo-50 flex items-center justify-center">.</div>
+
           <div data-key="/" class="key w-10 h-10 rounded-lg border bg-purple-50 flex items-center justify-center">/</div>
+
           <div data-key="Shift" class="key w-24 h-10 rounded-lg border bg-slate-100 flex items-center justify-center text-[10px]">Shift</div>
+
         </div>
+
         <!-- Row 5 -->
+
         <div class="flex gap-1 justify-center">
+
           <div data-key=" " class="key w-64 h-10 rounded-lg border bg-rose-50 flex items-center justify-center text-slate-400">Spacebar</div>
+
         </div>
+
       </div>
+
+
 
       <!-- Hands Overlay (SVG Overlapped) -->
+
       <div id="hands-overlay" class="absolute inset-0 pointer-events-none flex items-center justify-center z-20 transition-opacity duration-300">
+
         <svg viewBox="0 0 800 260" class="w-full max-w-3xl h-full opacity-40">
+
           <g stroke="#3b82f6" stroke-width="2.5" fill="rgba(59,130,246,0.08)" stroke-linecap="round" stroke-linejoin="round">
+
             <!-- Left Hand -->
+
             <path id="finger-L5" class="transition-all duration-100" d="M 120,160 Q 115,100 120,80 Q 128,80 135,100 L 140,160" />
+
             <path id="finger-L4" class="transition-all duration-100" d="M 150,150 Q 150,70 160,50 Q 170,50 175,70 L 175,150" />
+
             <path id="finger-L3" class="transition-all duration-100" d="M 185,150 Q 190,60 200,40 Q 210,40 215,60 L 210,150" />
+
             <path id="finger-L2" class="transition-all duration-100" d="M 225,150 Q 235,70 245,55 Q 255,55 255,75 L 245,150" />
+
             <path id="finger-L1" class="transition-all duration-100" d="M 260,180 Q 290,160 320,175 Q 320,190 295,195 L 260,200" />
+
             <path d="M 110,240 C 110,180 120,160 140,160 L 250,160 C 260,170 270,200 250,240 Z" stroke-dasharray="4 4" fill="none"/>
+
             
+
             <!-- Right Hand -->
+
             <path id="finger-R1" class="transition-all duration-100" d="M 540,180 Q 510,160 480,175 Q 480,190 505,195 L 540,200" />
+
             <path id="finger-R2" class="transition-all duration-100" d="M 555,150 Q 545,70 555,55 Q 565,55 575,75 L 565,150" />
+
             <path id="finger-R3" class="transition-all duration-100" d="M 590,150 Q 590,60 600,40 Q 610,40 615,60 L 610,150" />
+
             <path id="finger-R4" class="transition-all duration-100" d="M 625,150 Q 630,70 640,50 Q 650,50 650,70 L 645,150" />
+
             <path id="finger-R5" class="transition-all duration-100" d="M 660,160 Q 675,100 680,80 Q 688,80 685,100 L 675,160" />
+
             <path d="M 690,240 C 690,180 680,160 660,160 L 550,160 C 540,170 530,200 550,240 Z" stroke-dasharray="4 4" fill="none"/>
+
           </g>
+
         </svg>
+
       </div>
+
     </div>
+
   </main>
 
+
+
   <script>
+
     // Data Resources
+
     const posData = {
+
       home: ['ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ', ';'],
+
       top: ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'],
+
       bottom: ['ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ', ',', '.'],
+
       double: ['ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅒ', 'ㅖ']
+
     };
+
+
 
     const wordData = ['구름', '바다', '하늘', '비행기', '사과', '나무', '컴퓨터', '무지개', '한글', '타자', '연습', '대한민국', '초록색', '햇살', '바람'];
+
     
+
     const shortData = [
+
       '가는 말이 고와야 오는 말이 고운 법이다.',
+
       '세 살 버릇 여든까지 간다.',
+
       '티끌 모아 태산이 된다.',
+
       '원숭이도 나무에서 떨어질 때가 있다.',
+
       '고생 끝에 즐거움이 온다.',
+
       '돌다리도 두들겨 보고 건너라.'
+
     ];
+
+
 
     const longData = [
-      '동해 물과 백두산이 마르고 닳도록 하나님이 보우하사 우리나라 만세. 무궁화 삼천리 화려 강산 대한 사람 대한으로 길이 보전하세.',
-      '나의 두 눈에 너를 담아두고 싶은 마음뿐이야. 바람이 불어오는 곳 그곳으로 가네. 너의 미소가 내 맘을 밝혀주네.'
+
+      '동해 물과 백두산이 마르고 닳도록 하나님이 보우하사 우리나라 만세.',
+
+      '무궁화 삼천리 화려 강산 대한 사람 대한으로 길이 보전하세.',
+
+      '바람이 불어오는 곳 그곳으로 가네. 너의 미소가 내 맘을 밝혀주네.'
+
     ];
 
+
+
     // Key Mapping Logic
+
     const keyMap = {
+
       'ㄱ': 'r', 'ㄴ': 's', 'ㄷ': 'e', 'ㄹ': 'f', 'ㅁ': 'a', 'ㅂ': 'q', 'ㅅ': 't', 'ㅇ': 'd', 'ㅈ': 'w', 'ㅊ': 'c', 'ㅋ': 'z', 'ㅌ': 'x', 'ㅍ': 'v', 'ㅎ': 'g',
+
       'ㅏ': 'k', 'ㅑ': 'i', 'ㅓ': 'j', 'ㅕ': 'u', 'ㅗ': 'h', 'ㅛ': 'y', 'ㅜ': 'n', 'ㅠ': 'b', 'ㅡ': 'm', 'ㅣ': 'l', 'ㅐ': 'o', 'ㅔ': 'p',
+
       'ㅃ': 'Q', 'ㅉ': 'W', 'ㄸ': 'E', 'ㄲ': 'R', 'ㅆ': 'T', 'ㅒ': 'O', 'ㅖ': 'P', ';': ';'
+
     };
+
+
 
     const fingerMap = {
+
       '`':'L5','1':'L5','q':'L5','a':'L5','z':'L5',
+
       '2':'L4','w':'L4','s':'L4','x':'L4',
+
       '3':'L3','e':'L3','d':'L3','c':'L3',
+
       '4':'L2','5':'L2','r':'L2','t':'L2','f':'L2','g':'L2','v':'L2','b':'L2',
+
       ' ':'L1',
+
       '6':'R2','7':'R2','y':'R2','u':'R2','h':'R2','j':'R2','n':'R2','m':'R2',
+
       '8':'R3','i':'R3','k':'R3',',':'R3',
+
       '9':'R4','o':'R4','l':'R4','.':'R4',
+
       '0':'R5','-':'R5','=':'R5','p':'R5','[':'R5',']':'R5',';':'R5','\'':'R5','/':'R5'
+
     };
 
+
+
     // State Variables
+
     let currentMode = 'pos';
+
     let currentPosSub = 'home';
+
     let currentTarget = '';
+
     let soundEnabled = true;
+
     let handsVisible = true;
+
     let totalTyped = 0;
+
     let correctTyped = 0;
+
     let startTime = null;
+
     let maxCpm = 0;
+
     let gameInterval = null;
+
     let gameWords = [];
-    let isComposing = false;
+
+
 
     // Audio Context
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    let audioCtx = null;
+
     function playBeep(freq, type='sine', duration=0.05) {
+
       if (!soundEnabled) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
+
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      try {
+
+        const osc = audioCtx.createOscillator();
+
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+
+        osc.frequency.value = freq;
+
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+
+        osc.stop(audioCtx.currentTime + duration);
+
+      } catch(e) {}
+
     }
+
+
 
     // DOM Elements
+
     const targetTextEl = document.getElementById('target-text');
+
     const typeInputEl = document.getElementById('type-input');
+
     const cpmEl = document.getElementById('cpm');
+
     const maxCpmEl = document.getElementById('max-cpm');
+
     const accEl = document.getElementById('acc');
+
     const handsOverlay = document.getElementById('hands-overlay');
+
     const toggleHandsBtn = document.getElementById('toggle-hands-btn');
+
     const soundBtn = document.getElementById('sound-btn');
+
     const subPosMenu = document.getElementById('sub-pos-menu');
+
     const standardPracticeUI = document.getElementById('standard-practice');
+
     const gameContainer = document.getElementById('game-container');
+
     const gameInput = document.getElementById('game-input');
 
+
+
     // UI Updates & Hand Highlights
+
     function highlightKeyAndFinger(char) {
+
       document.querySelectorAll('.key').forEach(k => k.classList.remove('key-target'));
+
       document.querySelectorAll('#hands-overlay path').forEach(p => p.classList.remove('finger-active'));
 
+
+
+      if (!char) return;
+
       let key = keyMap[char] || char;
-      if (!key) return;
+
+
 
       let lookupKey = key.toLowerCase();
+
       let targetEl = document.querySelector(`.key[data-key="${lookupKey}"]`);
+
       if (targetEl) targetEl.classList.add('key-target');
 
+
+
       let fingerId = fingerMap[lookupKey];
+
       if (fingerId) {
+
         let fingerEl = document.getElementById(`finger-${fingerId}`);
+
         if (fingerEl) fingerEl.classList.add('finger-active');
+
       }
+
     }
+
+
 
     function initMode() {
+
       typeInputEl.value = '';
+
       if (currentMode === 'pos') {
+
         subPosMenu.classList.remove('hidden');
+
         standardPracticeUI.classList.remove('hidden');
+
         gameContainer.classList.add('hidden');
+
         const list = posData[currentPosSub];
+
         currentTarget = list[Math.floor(Math.random() * list.length)];
+
         targetTextEl.textContent = currentTarget;
+
         highlightKeyAndFinger(currentTarget);
+
       } else if (currentMode === 'word') {
+
         subPosMenu.classList.add('hidden');
+
         standardPracticeUI.classList.remove('hidden');
+
         gameContainer.classList.add('hidden');
+
         currentTarget = wordData[Math.floor(Math.random() * wordData.length)];
+
         targetTextEl.textContent = currentTarget;
+
         highlightKeyAndFinger(currentTarget[0]);
+
       } else if (currentMode === 'short') {
+
         subPosMenu.classList.add('hidden');
+
         standardPracticeUI.classList.remove('hidden');
+
         gameContainer.classList.add('hidden');
+
         currentTarget = shortData[Math.floor(Math.random() * shortData.length)];
+
         targetTextEl.textContent = currentTarget;
+
         highlightKeyAndFinger(currentTarget[0]);
+
       } else if (currentMode === 'long') {
+
         subPosMenu.classList.add('hidden');
+
         standardPracticeUI.classList.remove('hidden');
+
         gameContainer.classList.add('hidden');
+
         currentTarget = longData[Math.floor(Math.random() * longData.length)];
+
         targetTextEl.textContent = currentTarget;
+
         highlightKeyAndFinger(currentTarget[0]);
+
       } else if (currentMode === 'game') {
+
         subPosMenu.classList.add('hidden');
+
         standardPracticeUI.classList.add('hidden');
+
         gameContainer.classList.remove('hidden');
+
         startGame();
+
       }
+
+      setTimeout(() => typeInputEl.focus(), 50);
+
     }
 
-    // Process Input
-    typeInputEl.addEventListener('compositionstart', () => { isComposing = true; });
-    typeInputEl.addEventListener('compositionend', (e) => {
-      isComposing = false;
-      checkInput(e.data);
-    });
 
-    typeInputEl.addEventListener('input', (e) => {
+
+    // Input Handling
+
+    typeInputEl.addEventListener('input', () => {
+
       if (!startTime) startTime = new Date();
+
       playBeep(400);
 
-      // Handle space / punct advancement
-      if (currentMode === 'pos') {
-        checkInput(typeInputEl.value);
-      } else {
-        const val = typeInputEl.value;
-        const nextChar = currentTarget[val.length];
-        if (nextChar) highlightKeyAndFinger(nextChar);
+
+
+      const val = typeInputEl.value;
+
+
+
+      if (val === currentTarget) {
+
+        correctTyped += currentTarget.length;
+
+        totalTyped += currentTarget.length;
+
+        playBeep(800, 'sine', 0.1);
+
         updateStats();
+
+        initMode();
+
+      } else {
+
+        totalTyped++;
+
+        const nextChar = currentTarget[val.length];
+
+        if (nextChar) highlightKeyAndFinger(nextChar);
+
+        updateStats();
+
       }
+
     });
+
+
 
     typeInputEl.addEventListener('keydown', (e) => {
+
       if (e.key === 'Enter') {
-        if (currentMode !== 'pos') {
-          if (typeInputEl.value === currentTarget) {
-            correctTyped += currentTarget.length;
-            playBeep(800, 'sine', 0.1);
-          } else {
-            playBeep(150, 'square', 0.1);
-          }
-          totalTyped += currentTarget.length;
-          initMode();
+
+        const val = typeInputEl.value;
+
+        if (val === currentTarget) {
+
+          correctTyped += currentTarget.length;
+
+          playBeep(800, 'sine', 0.1);
+
+        } else {
+
+          playBeep(150, 'square', 0.1);
+
         }
+
+        totalTyped += currentTarget.length;
+
+        updateStats();
+
+        initMode();
+
       }
+
     });
 
-    function checkInput(val) {
-      if (!val) return;
 
-      if (currentMode === 'pos') {
-        totalTyped++;
-        if (val.trim() === currentTarget || val === currentTarget) {
-          correctTyped++;
-          playBeep(600);
-          setTimeout(initMode, 50);
-        } else {
-          playBeep(150, 'square');
-        }
-        typeInputEl.value = '';
-      }
-      updateStats();
-    }
 
     function updateStats() {
+
       if (!startTime) return;
+
       const elapsedMin = (new Date() - startTime) / 60000;
-      if (elapsedMin > 0) {
+
+      if (elapsedMin > 0.01) {
+
         const cpm = Math.round(correctTyped / elapsedMin);
-        cpmEl.textContent = cpm;
-        if (cpm > maxCpm) {
-          maxCpm = cpm;
-          maxCpmEl.textContent = maxCpm;
+
+        if (cpm < 2000) {
+
+          cpmEl.textContent = cpm;
+
+          if (cpm > maxCpm) {
+
+            maxCpm = cpm;
+
+            maxCpmEl.textContent = maxCpm;
+
+          }
+
         }
+
       }
-      const acc = totalTyped > 0 ? Math.round((correctTyped / totalTyped) * 100) : 100;
+
+      const acc = totalTyped > 0 ? Math.min(100, Math.round((correctTyped / totalTyped) * 100)) : 100;
+
       accEl.textContent = acc;
+
     }
 
-    // Navigation & Events
+
+
+    // Mode Navigation
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
+
       btn.addEventListener('click', () => {
+
         document.querySelectorAll('.nav-btn').forEach(b => {
+
           b.classList.remove('bg-blue-600', 'text-white');
+
           b.classList.add('hover:bg-slate-100', 'text-slate-600');
+
         });
+
         btn.classList.add('bg-blue-600', 'text-white');
+
         currentMode = btn.dataset.mode;
+
         initMode();
+
       });
+
     });
+
+
 
     document.querySelectorAll('.pos-btn').forEach(btn => {
+
       btn.addEventListener('click', () => {
+
         document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('bg-slate-200', 'text-slate-700'));
+
         btn.classList.add('bg-slate-200', 'text-slate-700');
+
         currentPosSub = btn.dataset.pos;
+
         initMode();
+
       });
+
     });
+
+
 
     toggleHandsBtn.addEventListener('click', () => {
+
       handsVisible = !handsVisible;
+
       handsOverlay.style.opacity = handsVisible ? '0.4' : '0';
+
       toggleHandsBtn.textContent = `손 윤곽선 표시: ${handsVisible ? 'ON' : 'OFF'}`;
+
     });
+
+
 
     soundBtn.addEventListener('click', () => {
+
       soundEnabled = !soundEnabled;
+
       soundBtn.textContent = `🔊 소리: ${soundEnabled ? 'ON' : 'OFF'}`;
+
     });
+
+
 
     // Rain Game
+
     function startGame() {
+
       clearInterval(gameInterval);
+
       const canvas = document.getElementById('game-canvas');
+
       canvas.innerHTML = '';
+
       gameWords = [];
 
+
+
       gameInterval = setInterval(() => {
+
         const wordText = wordData[Math.floor(Math.random() * wordData.length)];
+
         const el = document.createElement('div');
-        el.className = 'rain-word text-sm text-slate-700';
+
+        el.className = 'rain-word text-sm text-slate-900 bg-white shadow-md rounded-md';
+
         el.textContent = wordText;
+
         el.style.left = Math.random() * 80 + 10 + '%';
+
         el.style.top = '0px';
+
         canvas.appendChild(el);
+
         gameWords.push({ el, top: 0, text: wordText });
+
       }, 2000);
 
+
+
       requestAnimationFrame(updateGame);
+
+      setTimeout(() => gameInput.focus(), 50);
+
     }
+
+
 
     function updateGame() {
+
       if (currentMode !== 'game') return;
+
       gameWords.forEach((w, idx) => {
-        w.top += 1;
+
+        w.top += 0.8;
+
         w.el.style.top = w.top + 'px';
-        if (w.top > 200) {
+
+        if (w.top > 210) {
+
           w.el.remove();
+
           gameWords.splice(idx, 1);
+
         }
+
       });
+
       requestAnimationFrame(updateGame);
+
     }
 
+
+
     gameInput.addEventListener('keydown', (e) => {
+
       if (e.key === 'Enter') {
+
         const val = gameInput.value.trim();
+
         const foundIdx = gameWords.findIndex(w => w.text === val);
+
         if (foundIdx !== -1) {
+
           gameWords[foundIdx].el.remove();
+
           gameWords.splice(foundIdx, 1);
+
           correctTyped += val.length;
+
           playBeep(800);
+
+          updateStats();
+
         }
+
         gameInput.value = '';
+
       }
+
     });
 
-    // Global Key Events Sync
+
+
+    // Keyboard Visual Sync
+
     document.addEventListener('keydown', (e) => {
+
       let key = e.key;
+
       let targetEl = document.querySelector(`.key[data-key="${key.toLowerCase()}"]`);
+
       if (targetEl) targetEl.classList.add('key-active');
+
     });
+
+
 
     document.addEventListener('keyup', (e) => {
+
       let key = e.key;
+
       let targetEl = document.querySelector(`.key[data-key="${key.toLowerCase()}"]`);
+
       if (targetEl) targetEl.classList.remove('key-active');
+
     });
 
-    // Initial Start
+
+
+    // Start
+
     initMode();
+
   </script>
+
 </body>
+
 </html>
