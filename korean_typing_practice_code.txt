@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한글 타자 연습 - Korean Typing Master</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        finger: {
+                            l_pinky: '#ec4899',
+                            l_ring: '#f97316',
+                            l_middle: '#eab308',
+                            l_index: '#10b981',
+                            r_index: '#06b6d4',
+                            r_middle: '#3b82f6',
+                            r_ring: '#6366f1',
+                            r_pinky: '#8b5cf6',
+                            thumb: '#ef4444'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            user-select: none;
+        }
+
+        .key-cap {
+            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+        }
+
+        .key-cap.active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+            filter: brightness(0.9);
+        }
+
+        /* Target Key pulse */
+        .key-cap.target-key {
+            animation: pulse-key 1s infinite alternate;
+            box-shadow: 0 0 14px rgba(14, 165, 233, 0.9), 0 3px 0 rgba(0,0,0,0.2);
+            border-color: #0284c7 !important;
+            transform: translateY(-2px);
+            z-index: 10;
+        }
+
+        @keyframes pulse-key {
+            0% { transform: scale(1) translateY(-2px); }
+            100% { transform: scale(1.06) translateY(-4px); }
+        }
+
+        /* Color Coding Key Styles */
+        .key-f-l-pinky { background-color: rgba(252, 231, 243, 0.85); border-color: #fbcfe8; color: #be185d; }
+        .key-f-l-ring  { background-color: rgba(255, 237, 213, 0.85); border-color: #fed7aa; color: #c2410c; }
+        .key-f-l-middle{ background-color: rgba(254, 249, 195, 0.85); border-color: #fef08a; color: #a16207; }
+        .key-f-l-index { background-color: rgba(209, 250, 229, 0.85); border-color: #a7f3d0; color: #047857; }
+        .key-f-r-index { background-color: rgba(207, 250, 254, 0.85); border-color: #a5f3fc; color: #0e7490; }
+        .key-f-r-middle{ background-color: rgba(219, 234, 254, 0.85); border-color: #bfdbfe; color: #1d4ed8; }
+        .key-f-r-ring  { background-color: rgba(224, 231, 255, 0.85); border-color: #c7d2fe; color: #4338ca; }
+        .key-f-r-pinky { background-color: rgba(237, 233, 254, 0.85); border-color: #ddd6fe; color: #6d28d9; }
+        .key-f-thumb   { background-color: rgba(254, 226, 226, 0.85); border-color: #fca5a5; color: #b91c1c; }
+
+        .dark .key-f-l-pinky { background-color: rgba(131, 24, 67, 0.7); border-color: #9d174d; color: #fbcfe8; }
+        .dark .key-f-l-ring  { background-color: rgba(124, 45, 18, 0.7); border-color: #9a3412; color: #fed7aa; }
+        .dark .key-f-l-middle{ background-color: rgba(113, 63, 18, 0.7); border-color: #854d0e; color: #fef08a; }
+        .dark .key-f-l-index { background-color: rgba(6, 78, 59, 0.7); border-color: #065f46; color: #a7f3d0; }
+        .dark .key-f-r-index { background-color: rgba(22, 78, 99, 0.7); border-color: #155e75; color: #a5f3fc; }
+        .dark .key-f-r-middle{ background-color: rgba(30, 58, 138, 0.7); border-color: #1e40af; color: #bfdbfe; }
+        .dark .key-f-r-ring  { background-color: rgba(49, 46, 129, 0.7); border-color: #3730a3; color: #c7d2fe; }
+        .dark .key-f-r-pinky { background-color: rgba(76, 29, 149, 0.7); border-color: #5b21b6; color: #ddd6fe; }
+        .dark .key-f-thumb   { background-color: rgba(127, 29, 29, 0.7); border-color: #991b1b; color: #fca5a5; }
+
+        /* Translucent Overlapping SVG Hands Style */
+        .finger-outline {
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), stroke-width 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+            stroke-dasharray: 4, 2;
+            opacity: 0.7;
+            transform-origin: center top;
+        }
+
+        .finger-outline.target-finger {
+            opacity: 1 !important;
+            stroke-dasharray: none;
+            stroke-width: 3.5px !important;
+            filter: drop-shadow(0px 4px 10px rgba(56, 189, 248, 0.9));
+            animation: press-finger 0.8s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .finger-outline.pressed-finger {
+            transform: translateY(8px) scale(0.96) !important;
+            stroke-width: 4px !important;
+            filter: drop-shadow(0px 2px 14px rgba(234, 179, 8, 1)) !important;
+        }
+
+        @keyframes press-finger {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(7px) scale(0.95); }
+        }
+
+        .falling-word {
+            position: absolute;
+            transition: top 0.1s linear;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .char-correct { color: #10b981; }
+        .char-incorrect { color: #ef4444; background-color: #fee2e2; border-radius: 2px; }
+        .dark .char-incorrect { background-color: #991b1b; }
+        .char-pending { color: #9ca3af; }
+    </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col transition-colors duration-200 overflow-x-hidden">
+
+    <!-- Header Navigation -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between shadow-sm gap-2">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-sky-500 to-blue-600 text-white p-2.5 rounded-xl shadow-md">
+                <i class="fa-solid fa-keyboard text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-black tracking-tight bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent">한글 타자 연습</h1>
+                <p class="text-[11px] text-slate-400 font-medium">키보드 오버랩 손가락 가이드</p>
+            </div>
+        </div>
+
+        <!-- Mode Navigation Tabs -->
+        <nav class="flex space-x-1 bg-slate-100 dark:bg-slate-700/60 p-1 rounded-xl text-xs sm:text-sm font-semibold">
+            <button onclick="switchTab('position')" id="tab-position" class="tab-btn px-3 sm:px-4 py-2 rounded-lg transition-all">자리연습</button>
+            <button onclick="switchTab('word')" id="tab-word" class="tab-btn px-3 sm:px-4 py-2 rounded-lg transition-all">낱말연습</button>
+            <button onclick="switchTab('short')" id="tab-short" class="tab-btn px-3 sm:px-4 py-2 rounded-lg transition-all">단문연습</button>
+            <button onclick="switchTab('long')" id="tab-long" class="tab-btn px-3 sm:px-4 py-2 rounded-lg transition-all">긴글연습</button>
+            <button onclick="switchTab('game')" id="tab-game" class="tab-btn px-3 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5"><i class="fa-solid fa-gamepad text-sky-500"></i>산성비 게임</button>
+        </nav>
+
+        <!-- Utility Toggles -->
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleHandsOverlay()" id="hands-toggle-btn" class="px-3 py-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-300 hover:bg-sky-100 transition-all text-xs font-bold flex items-center gap-1.5" title="손 모양 표시 토글">
+                <i class="fa-solid fa-hand"></i>
+                <span>손 윤곽선 표시</span>
+            </button>
+            <button onclick="toggleAudio()" id="audio-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-all" title="음향 효과 켜기/끄기">
+                <i class="fa-solid fa-volume-high" id="audio-icon"></i>
+            </button>
+            <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-all" title="다크 모드">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Real-time Dashboard Bar -->
+    <section class="bg-white dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700/60 py-2.5 px-4 sm:px-6 shadow-inner">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center text-xs sm:text-sm gap-2">
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-500 dark:text-slate-400">현재 타수:</span>
+                    <span id="stat-cpm" class="text-lg font-extrabold text-sky-600 dark:text-sky-400">0</span>
+                    <span class="text-[11px] text-slate-400">타/분</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-500 dark:text-slate-400">최고 타수:</span>
+                    <span id="stat-max-cpm" class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">0</span>
+                    <span class="text-[11px] text-slate-400">타/분</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-500 dark:text-slate-400">정확도:</span>
+                    <span id="stat-accuracy" class="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">100</span>
+                    <span class="text-[11px] text-slate-400">%</span>
+                </div>
+            </div>
+            <!-- Sub Mode Options -->
+            <div id="sub-mode-selector" class="flex items-center space-x-1.5 flex-wrap">
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-5 flex flex-col justify-between items-center overflow-y-auto">
+        
+        <!-- Practice Card Box -->
+        <div id="practice-card" class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col justify-center items-center relative min-h-[170px] sm:min-h-[190px] transition-all cursor-pointer">
+            
+            <div id="display-area" class="w-full text-center my-auto">
+                <div id="guide-text" class="text-xs sm:text-sm font-bold text-sky-600 dark:text-sky-400 mb-2">기본 자리를 익혀보세요</div>
+                
+                <!-- Single Key / Word Target Display -->
+                <div id="single-target-wrapper" class="py-1">
+                    <div id="target-char" class="text-6xl sm:text-7xl font-black tracking-wider text-slate-800 dark:text-slate-100">ㅁ</div>
+                </div>
+
+                <!-- Sentence Display -->
+                <div id="sentence-target-wrapper" class="hidden text-left space-y-3 max-w-3xl mx-auto w-full">
+                    <div id="sentence-original" class="text-lg sm:text-2xl font-bold tracking-wide text-slate-700 dark:text-slate-200 font-mono leading-relaxed select-none"></div>
+                    <div id="sentence-preview" class="text-lg sm:text-2xl font-bold tracking-wide font-mono h-9 border-b-2 border-sky-500 leading-relaxed text-sky-600 dark:text-sky-400"></div>
+                </div>
+
+                <!-- Long Text Display -->
+                <div id="longtext-target-wrapper" class="hidden text-left space-y-3 max-w-3xl mx-auto w-full">
+                    <div class="bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-h-32 overflow-y-auto" id="long-prev-lines"></div>
+                    <div id="long-current-line" class="text-base sm:text-xl font-bold text-slate-800 dark:text-slate-100 font-mono"></div>
+                    <div id="long-typed-preview" class="text-base sm:text-xl font-bold font-mono h-8 border-b-2 border-sky-500 text-sky-600 dark:text-sky-400"></div>
+                </div>
+            </div>
+
+            <!-- Hidden Input Trigger -->
+            <input type="text" id="type-input" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer" autocomplete="off" spellcheck="false">
+        </div>
+
+        <!-- Rain Typing Game Canvas -->
+        <div id="game-card" class="hidden w-full bg-slate-900 rounded-2xl shadow-md border border-slate-700 p-4 relative h-[420px] flex flex-col justify-between overflow-hidden">
+            <div class="flex justify-between items-center text-white z-10 px-4 py-2 bg-slate-800/90 rounded-xl border border-slate-700">
+                <div class="flex space-x-6 text-sm">
+                    <div>점수: <span id="game-score" class="text-emerald-400 font-bold">0</span></div>
+                    <div>라이프: <span id="game-lives" class="text-rose-500 font-bold">❤️❤️❤️❤️❤️</span></div>
+                    <div>단계: <span id="game-level" class="text-amber-400 font-bold">1</span></div>
+                </div>
+                <button id="game-start-btn" onclick="toggleGame()" class="px-4 py-1.5 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-bold text-xs transition-all shadow">게임 시작</button>
+            </div>
+
+            <div id="game-area" class="relative flex-1 w-full overflow-hidden">
+                <div id="game-overlay" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center text-white z-20">
+                    <i class="fa-solid fa-cloud-showers-heavy text-5xl text-sky-400 mb-3"></i>
+                    <h2 class="text-2xl font-extrabold mb-1">산성비 타자 게임</h2>
+                    <p class="text-slate-400 text-xs mb-6">단어가 땅에 닿기 전에 신속하게 입력하세요!</p>
+                    <button onclick="toggleGame()" class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 font-bold rounded-xl shadow-lg transition-all transform hover:scale-105">게임 시작하기</button>
+                </div>
+            </div>
+
+            <div class="z-10 mt-2">
+                <input type="text" id="game-input" placeholder="여기에 단어를 입력하고 Enter를 누르세요" class="w-full bg-slate-800 text-white px-4 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 text-center font-bold text-base shadow-inner" disabled>
+            </div>
+        </div>
+
+        <!-- Virtual Keyboard Container WITH DIRECT HAND OVERLAY LAYER -->
+        <div id="keyboard-container" class="relative w-full max-w-4xl mt-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-2.5 sm:p-4 overflow-hidden">
+            
+            <!-- Key Caps Layout -->
+            <div class="space-y-1 sm:space-y-1.5 text-xs font-bold select-none relative z-10">
+                <!-- Row 1 -->
+                <div class="flex justify-center space-x-1 sm:space-x-1.5">
+                    <div class="key-cap key-f-l-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Backquote">`</div>
+                    <div class="key-cap key-f-l-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit1">1</div>
+                    <div class="key-cap key-f-l-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit2">2</div>
+                    <div class="key-cap key-f-l-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit3">3</div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit4">4</div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit5">5</div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit6">6</div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit7">7</div>
+                    <div class="key-cap key-f-r-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit8">8</div>
+                    <div class="key-cap key-f-r-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit9">9</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Digit0">0</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Minus">-</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Equal">=</div>
+                    <div class="key-cap bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg h-8 sm:h-10 flex-1 flex items-center justify-center text-[10px] text-slate-500" data-key="Backspace">Bksp</div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="flex justify-center space-x-1 sm:space-x-1.5">
+                    <div class="key-cap bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg h-8 sm:h-10 w-9 sm:w-14 flex items-center justify-center text-[10px] text-slate-500" data-key="Tab">Tab</div>
+                    <div class="key-cap key-f-l-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyQ"><span>ㅃ</span><span class="text-[9px] opacity-60 font-normal">ㅂ</span></div>
+                    <div class="key-cap key-f-l-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyW"><span>ㅉ</span><span class="text-[9px] opacity-60 font-normal">ㅈ</span></div>
+                    <div class="key-cap key-f-l-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyE"><span>ㄸ</span><span class="text-[9px] opacity-60 font-normal">ㄷ</span></div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyR"><span>ㄲ</span><span class="text-[9px] opacity-60 font-normal">ㄱ</span></div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyT"><span>ㅆ</span><span class="text-[9px] opacity-60 font-normal">ㅅ</span></div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyY"><span>ㅛ</span></div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyU"><span>ㅕ</span></div>
+                    <div class="key-cap key-f-r-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyI"><span>ㅑ</span></div>
+                    <div class="key-cap key-f-r-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyO"><span>ㅖ</span><span class="text-[9px] opacity-60 font-normal">ㅐ</span></div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex flex-col items-center justify-center border" data-key="KeyP"><span>ㅒ</span><span class="text-[9px] opacity-60 font-normal">ㅔ</span></div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="BracketLeft">[</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="BracketRight">]</div>
+                </div>
+
+                <!-- Row 3 (Home Row) -->
+                <div class="flex justify-center space-x-1 sm:space-x-1.5">
+                    <div class="key-cap bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg h-8 sm:h-10 w-11 sm:w-16 flex items-center justify-center text-[10px] text-slate-500" data-key="CapsLock">Caps</div>
+                    <div class="key-cap key-f-l-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyA">ㅁ</div>
+                    <div class="key-cap key-f-l-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyS">ㄴ</div>
+                    <div class="key-cap key-f-l-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyD">ㄷ</div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border relative" data-key="KeyF">ㄹ<span class="absolute bottom-1 w-1.5 h-0.5 bg-slate-500 rounded-full"></span></div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyG">ㅎ</div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyH">ㅗ</div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border relative" data-key="KeyJ">ㅓ<span class="absolute bottom-1 w-1.5 h-0.5 bg-slate-500 rounded-full"></span></div>
+                    <div class="key-cap key-f-r-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyK">ㅏ</div>
+                    <div class="key-cap key-f-r-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyL">ㅣ</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Semicolon">;</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Quote">'</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 flex-1 flex items-center justify-center border text-[10px]" data-key="Enter">Enter</div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="flex justify-center space-x-1 sm:space-x-1.5">
+                    <div class="key-cap key-f-l-pinky rounded-lg h-8 sm:h-10 w-12 sm:w-20 flex items-center justify-center border text-[10px]" data-key="ShiftLeft">Shift</div>
+                    <div class="key-cap key-f-l-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyZ">ㅋ</div>
+                    <div class="key-cap key-f-l-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyX">ㅌ</div>
+                    <div class="key-cap key-f-l-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyC">ㅊ</div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyV">ㅍ</div>
+                    <div class="key-cap key-f-l-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyB">ㅠ</div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyN">ㅜ</div>
+                    <div class="key-cap key-f-r-index rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="KeyM">ㅡ</div>
+                    <div class="key-cap key-f-r-middle rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Comma">,</div>
+                    <div class="key-cap key-f-r-ring rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Period">.</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 w-7 sm:w-11 flex items-center justify-center border" data-key="Slash">/</div>
+                    <div class="key-cap key-f-r-pinky rounded-lg h-8 sm:h-10 flex-1 flex items-center justify-center border text-[10px]" data-key="ShiftRight">Shift</div>
+                </div>
+
+                <!-- Row 5 (Spacebar) -->
+                <div class="flex justify-center space-x-1 sm:space-x-1.5">
+                    <div class="key-cap key-f-thumb rounded-lg h-8 sm:h-9 w-60 sm:w-72 flex items-center justify-center border text-[10px]" data-key="Space">Spacebar</div>
+                </div>
+            </div>
+
+            <!-- TRANSLUCENT HAND OVERLAY SVG LAYER -->
+            <div id="hands-overlay-layer" class="absolute inset-0 pointer-events-none z-20 flex justify-center items-center p-2">
+                <svg class="w-full h-full max-w-4xl" viewBox="0 0 800 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- LEFT HAND OUTLINES -->
+                    <path id="f-l-pinky" class="finger-outline" d="M125,120 C125,95 130,85 135,85 C140,85 145,95 145,120 Z" stroke="#ec4899" stroke-width="2.5" fill="rgba(236, 72, 153, 0.08)" />
+                    <path id="f-l-ring" class="finger-outline" d="M170,115 C170,80 176,70 182,70 C188,70 194,80 194,115 Z" stroke="#f97316" stroke-width="2.5" fill="rgba(249, 115, 22, 0.08)" />
+                    <path id="f-l-middle" class="finger-outline" d="M218,110 C218,72 225,60 232,60 C239,60 246,72 246,110 Z" stroke="#eab308" stroke-width="2.5" fill="rgba(234, 179, 8, 0.08)" />
+                    <path id="f-l-index" class="finger-outline" d="M268,115 C268,78 275,68 282,68 C289,68 296,78 296,115 Z" stroke="#10b981" stroke-width="2.5" fill="rgba(16, 185, 129, 0.08)" />
+                    <path id="f-l-thumb" class="finger-outline" d="M320,185 C335,170 350,172 355,180 C360,188 350,200 330,205 Z" stroke="#ef4444" stroke-width="2.5" fill="rgba(239, 68, 68, 0.08)" />
+                    <path d="M125,120 C110,160 140,225 240,225 C290,225 320,195 320,185" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" fill="none" opacity="0.35" />
+
+                    <!-- RIGHT HAND OUTLINES -->
+                    <path id="f-r-thumb" class="finger-outline" d="M480,185 C465,170 450,172 445,180 C440,188 450,200 470,205 Z" stroke="#ef4444" stroke-width="2.5" fill="rgba(239, 68, 68, 0.08)" />
+                    <path id="f-r-index" class="finger-outline" d="M504,115 C504,78 511,68 518,68 C525,68 532,78 532,115 Z" stroke="#06b6d4" stroke-width="2.5" fill="rgba(6, 182, 212, 0.08)" />
+                    <path id="f-r-middle" class="finger-outline" d="M554,110 C554,72 561,60 568,60 C575,60 582,72 582,110 Z" stroke="#3b82f6" stroke-width="2.5" fill="rgba(59, 130, 246, 0.08)" />
+                    <path id="f-r-ring" class="finger-outline" d="M604,115 C604,80 610,70 616,70 C622,70 628,80 628,115 Z" stroke="#6366f1" stroke-width="2.5" fill="rgba(99, 102, 241, 0.08)" />
+                    <path id="f-r-pinky" class="finger-outline" d="M653,120 C653,95 658,85 663,85 C668,85 673,95 673,120 Z" stroke="#8b5cf6" stroke-width="2.5" fill="rgba(139, 92, 246, 0.08)" />
+                    <path d="M673,120 C688,160 658,225 558,225 C508,225 480,195 480,185" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" fill="none" opacity="0.35" />
+                </svg>
+            </div>
+
+        </div>
+
+        <!-- Finger Recommendation Info Tag -->
+        <div class="mt-2 text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2">
+            <span>추천 손가락:</span>
+            <span id="finger-name-tag" class="px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold border border-sky-200 dark:border-sky-800 shadow-sm">
+                왼손 검지 (ㄹ / F)
+            </span>
+        </div>
+
+    </main>
+
+    <!-- Sound Effects Module (Web Audio API) -->
+    <script>
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playKeySound() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.04);
+            }
+
+            playErrorSound() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(70, this.ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.12);
+            }
+
+            playSuccessSound() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.07);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            }
+        }
+
+        const sound = new SoundFX();
+
+        function toggleAudio() {
+            sound.enabled = !sound.enabled;
+            const icon = document.getElementById('audio-icon');
+            icon.className = sound.enabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark text-rose-500';
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function toggleHandsOverlay() {
+            const layer = document.getElementById('hands-overlay-layer');
+            const btn = document.getElementById('hands-toggle-btn');
+            if (layer.classList.contains('hidden')) {
+                layer.classList.remove('hidden');
+                btn.classList.add('bg-sky-50', 'text-sky-600');
+                btn.classList.remove('bg-slate-100', 'text-slate-500');
+            } else {
+                layer.classList.add('hidden');
+                btn.classList.remove('bg-sky-50', 'text-sky-600');
+                btn.classList.add('bg-slate-100', 'text-slate-500');
+            }
+        }
+    </script>
+
+    <!-- Main Typing Logic & Finger Mapping -->
+    <script>
+        const DATA = {
+            position: {
+                home: ['ㅁ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ', ';'],
+                top: ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'],
+                bottom: ['ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'],
+                shift: ['ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅒ', 'ㅖ']
+            },
+            word: {
+                easy: ['구름', '바다', '하늘', '나무', '사과', '바나나', '강아지', '고양이', '학교', '연필', '지우개'],
+                medium: ['대한민국', '한글타자', '인공지능', '프로그래밍', '컴퓨터', '자바스크립트', '알고리즘', '스마트폰'],
+                hard: ['시끌벅적', '방방곡곡', '우왕좌왕', '갈팡질팡', '칠전팔기', '속전속결', '설상가상']
+            },
+            short: [
+                '동해 물과 백두산이 마르고 닳도록',
+                '자세히 보아야 예쁘다 오래 보아야 사랑스럽다 너도 그렇다',
+                '시작이 반이다',
+                '가는 말이 고와야 오는 말이 깁니다',
+                '고생 끝에 낙이 온다',
+                '실패는 성공의 어머니이다',
+                '내일은 내일의 태양이 뜬다'
+            ],
+            long: [
+                {
+                    title: '애국가',
+                    lines: [
+                        '동해 물과 백두산이 마르고 닳도록',
+                        '하느님이 보우하사 우리나라 만세',
+                        '무궁화 삼천리 화려 강산',
+                        '대한 사람 대한으로 길이 보전하세'
+                    ]
+                },
+                {
+                    title: '별 헤는 밤 (윤동주)',
+                    lines: [
+                        '계절이 지나가는 하늘에는 가을로 가득 차 있습니다.',
+                        '나는 아무 걱정도 없이 가을 속의 별들을 다 헤일 듯합니다.',
+                        '가슴 속에 하나 둘 새겨지는 별을 이제 다 못 헤는 것은',
+                        '쉬이 아침이 오는 까닭이요, 내일 밤이 남아 있는 까닭입니다.'
+                    ]
+                }
+            ]
+        };
+
+        const FINGER_MAPPING = {
+            'f-l-pinky':  { name: '왼손 새끼', keys: ['Backquote', 'Digit1', 'KeyQ', 'KeyA', 'KeyZ', 'ShiftLeft'] },
+            'f-l-ring':   { name: '왼손 약지', keys: ['Digit2', 'KeyW', 'KeyS', 'KeyX'] },
+            'f-l-middle': { name: '왼손 중지', keys: ['Digit3', 'KeyE', 'KeyD', 'KeyC'] },
+            'f-l-index':  { name: '왼손 검지', keys: ['Digit4', 'Digit5', 'KeyR', 'KeyT', 'KeyF', 'KeyG', 'KeyV', 'KeyB'] },
+            'f-r-index':  { name: '오른손 검지', keys: ['Digit6', 'Digit7', 'KeyY', 'KeyU', 'KeyH', 'KeyJ', 'KeyN', 'KeyM'] },
+            'f-r-middle': { name: '오른손 중지', keys: ['Digit8', 'KeyI', 'KeyK', 'Comma'] },
+            'f-r-ring':   { name: '오른손 약지', keys: ['Digit9', 'KeyO', 'KeyL', 'Period'] },
+            'f-r-pinky':  { name: '오른손 새끼', keys: ['Digit0', 'Minus', 'Equal', 'KeyP', 'BracketLeft', 'BracketRight', 'Semicolon', 'Quote', 'Slash', 'Enter', 'ShiftRight', 'Backspace'] },
+            'f-l-thumb':  { name: '왼손 엄지', keys: ['Space'] },
+            'f-r-thumb':  { name: '오른손 엄지', keys: ['Space'] }
+        };
+
+        const HANGUL_KEY_MAP = {
+            'ㅁ': 'KeyA', 'ㄴ': 'KeyS', 'ㄷ': 'KeyD', 'ㄹ': 'KeyF', 'ㅎ': 'KeyG',
+            'ㅗ': 'KeyH', 'ㅓ': 'KeyJ', 'ㅏ': 'KeyK', 'ㅣ': 'KeyL', ';': 'Semicolon',
+            'ㅂ': 'KeyQ', 'ㅈ': 'KeyW', 'ㄱ': 'KeyR', 'ㅅ': 'KeyT',
+            'ㅛ': 'KeyY', 'ㅕ': 'KeyU', 'ㅑ': 'KeyI', 'ㅐ': 'KeyO', 'ㅔ': 'KeyP',
+            'ㅋ': 'KeyZ', 'ㅌ': 'KeyX', 'ㅊ': 'KeyC', 'ㅍ': 'KeyV', 'ㅠ': 'KeyB',
+            'ㅜ': 'KeyN', 'ㅡ': 'KeyM',
+            'ㅃ': 'KeyQ', 'ㅉ': 'KeyW', 'ㄸ': 'KeyE', 'ㄲ': 'KeyR', 'ㅆ': 'KeyT',
+            'ㅒ': 'KeyO', 'ㅖ': 'KeyP',
+            ' ': 'Space'
+        };
+
+        let currentTab = 'position';
+        let subMode = 'home';
+        let currentTargetText = '';
+        let typedCount = 0;
+        let errorCount = 0;
+        let startTime = null;
+        let maxCpm = 0;
+        let longLineIndex = 0;
+        let isComposing = false; // Korean IME Composition state
+
+        const typeInput = document.getElementById('type-input');
+        const statCpm = document.getElementById('stat-cpm');
+        const statMaxCpm = document.getElementById('stat-max-cpm');
+        const statAccuracy = document.getElementById('stat-accuracy');
+        const subModeSelector = document.getElementById('sub-mode-selector');
+
+        window.onload = function() {
+            switchTab('position');
+            setupInputListener();
+            setupKeyboardEvents();
+        };
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-sky-600', 'dark:text-sky-400');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-sky-600', 'dark:text-sky-400');
+
+            if (tab === 'game') {
+                document.getElementById('practice-card').classList.add('hidden');
+                document.getElementById('keyboard-container').classList.add('hidden');
+                document.getElementById('game-card').classList.remove('hidden');
+                subModeSelector.innerHTML = '';
+                stopGame();
+                return;
+            } else {
+                document.getElementById('practice-card').classList.remove('hidden');
+                document.getElementById('keyboard-container').classList.remove('hidden');
+                document.getElementById('game-card').classList.add('hidden');
+                stopGame();
+            }
+
+            renderSubModeSelector();
+            resetStats();
+            loadNextTarget();
+            focusInput();
+        }
+
+        function renderSubModeSelector() {
+            subModeSelector.innerHTML = '';
+            let options = [];
+
+            if (currentTab === 'position') {
+                options = [
+                    { id: 'home', name: '기본 자리' },
+                    { id: 'top', name: '윗글자' },
+                    { id: 'bottom', name: '아랫글자' },
+                    { id: 'shift', name: '쌍자음/단모음' }
+                ];
+            } else if (currentTab === 'word') {
+                options = [
+                    { id: 'easy', name: '쉬운 낱말' },
+                    { id: 'medium', name: '보통 낱말' },
+                    { id: 'hard', name: '어려운 낱말' }
+                ];
+            } else if (currentTab === 'long') {
+                options = DATA.long.map((item, idx) => ({ id: idx, name: item.title }));
+            }
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = `px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${subMode == opt.id ? 'bg-sky-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`;
+                btn.innerText = opt.name;
+                btn.onclick = () => {
+                    subMode = opt.id;
+                    renderSubModeSelector();
+                    resetStats();
+                    loadNextTarget();
+                    focusInput();
+                };
+                subModeSelector.appendChild(btn);
+            });
+
+            if (options.length > 0 && !options.some(o => o.id == subMode)) {
+                subMode = options[0].id;
+            }
+        }
+
+        function loadNextTarget() {
+            typeInput.value = '';
+            
+            document.getElementById('single-target-wrapper').classList.add('hidden');
+            document.getElementById('sentence-target-wrapper').classList.add('hidden');
+            document.getElementById('longtext-target-wrapper').classList.add('hidden');
+
+            if (currentTab === 'position') {
+                document.getElementById('single-target-wrapper').classList.remove('hidden');
+                const list = DATA.position[subMode] || DATA.position.home;
+                currentTargetText = list[Math.floor(Math.random() * list.length)];
+                document.getElementById('target-char').innerText = currentTargetText;
+                document.getElementById('guide-text').innerText = '가상 키보드 위 투명 손가락 오버랩을 참고하여 타자하세요';
+                updateTargetKeyAndFinger(currentTargetText);
+            } else if (currentTab === 'word') {
+                document.getElementById('single-target-wrapper').classList.remove('hidden');
+                const list = DATA.word[subMode] || DATA.word.easy;
+                currentTargetText = list[Math.floor(Math.random() * list.length)];
+                document.getElementById('target-char').innerText = currentTargetText;
+                document.getElementById('guide-text').innerText = '낱말을 입력하고 Space 키를 누르세요';
+                updateTargetKeyAndFinger(currentTargetText[0]);
+            } else if (currentTab === 'short') {
+                document.getElementById('sentence-target-wrapper').classList.remove('hidden');
+                currentTargetText = DATA.short[Math.floor(Math.random() * DATA.short.length)];
+                renderSentenceTarget(currentTargetText, '');
+                document.getElementById('guide-text').innerText = '문장을 그대로 입력한 후 Enter 키를 누르세요';
+                updateTargetKeyAndFinger(currentTargetText[0]);
+            } else if (currentTab === 'long') {
+                document.getElementById('longtext-target-wrapper').classList.remove('hidden');
+                const article = DATA.long[subMode] || DATA.long[0];
+                if (longLineIndex >= article.lines.length) longLineIndex = 0;
+                
+                currentTargetText = article.lines[longLineIndex];
+                
+                const prevBox = document.getElementById('long-prev-lines');
+                prevBox.innerHTML = article.lines.map((l, idx) => 
+                    `<div class="${idx === longLineIndex ? 'text-sky-600 dark:text-sky-400 font-bold' : ''}">${idx + 1}. ${l}</div>`
+                ).join('');
+                
+                document.getElementById('long-current-line').innerText = currentTargetText;
+                document.getElementById('long-typed-preview').innerText = '';
+                document.getElementById('guide-text').innerText = `긴글 연습: ${article.title} (${longLineIndex + 1}/${article.lines.length})`;
+                updateTargetKeyAndFinger(currentTargetText[0]);
+            }
+        }
+
+        function focusInput() {
+            typeInput.focus();
+            document.getElementById('practice-card').onclick = () => typeInput.focus();
+        }
+
+        function setupInputListener() {
+            typeInput.addEventListener('compositionstart', () => { isComposing = true; });
+            typeInput.addEventListener('compositionend', () => { 
+                isComposing = false; 
+                handleTypingCheck();
+            });
+
+            typeInput.addEventListener('input', () => {
+                if (!startTime && typeInput.value.length > 0) {
+                    startTime = new Date();
+                }
+                handleTypingCheck();
+            });
+
+            typeInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const val = typeInput.value.trim();
+                    if (currentTab === 'word' && val === currentTargetText) {
+                        advanceToNext(true);
+                        e.preventDefault();
+                    } else if (currentTab === 'short') {
+                        if (val === currentTargetText) {
+                            advanceToNext(true);
+                        } else if (typeInput.value.length >= currentTargetText.length) {
+                            advanceToNext(false);
+                        }
+                        e.preventDefault();
+                    } else if (currentTab === 'long') {
+                        typedCount += val.length;
+                        longLineIndex++;
+                        sound.playSuccessSound();
+                        updateStats();
+                        loadNextTarget();
+                        e.preventDefault();
+                    }
+                }
+            });
+        }
+
+        function handleTypingCheck() {
+            const val = typeInput.value;
+
+            if (currentTab === 'position') {
+                if (val === currentTargetText) {
+                    sound.playSuccessSound();
+                    typedCount++;
+                    updateStats();
+                    setTimeout(() => loadNextTarget(), 100);
+                } else if (val.length >= currentTargetText.length && !isComposing) {
+                    sound.playErrorSound();
+                    errorCount++;
+                    updateStats();
+                    typeInput.value = '';
+                }
+            } else if (currentTab === 'word') {
+                if (val === currentTargetText) {
+                    advanceToNext(true);
+                } else {
+                    sound.playKeySound();
+                    const nextCharIndex = val.length;
+                    if (nextCharIndex < currentTargetText.length) {
+                        updateTargetKeyAndFinger(currentTargetText[nextCharIndex]);
+                    }
+                }
+            } else if (currentTab === 'short') {
+                renderSentenceTarget(currentTargetText, val);
+                sound.playKeySound();
+                if (val === currentTargetText) {
+                    advanceToNext(true);
+                } else {
+                    const nextCharIndex = val.length;
+                    if (nextCharIndex < currentTargetText.length) {
+                        updateTargetKeyAndFinger(currentTargetText[nextCharIndex]);
+                    }
+                }
+            } else if (currentTab === 'long') {
+                renderLongTextTarget(currentTargetText, val);
+                sound.playKeySound();
+                const nextCharIndex = val.length;
+                if (nextCharIndex < currentTargetText.length) {
+                    updateTargetKeyAndFinger(currentTargetText[nextCharIndex]);
+                }
+            }
+        }
+
+        function advanceToNext(isSuccess) {
+            if (isSuccess) {
+                sound.playSuccessSound();
+                typedCount += currentTargetText.length;
+            } else {
+                sound.playErrorSound();
+                errorCount += 2;
+            }
+            updateStats();
+            loadNextTarget();
+        }
+
+        function renderSentenceTarget(target, typed) {
+            const originalDiv = document.getElementById('sentence-original');
+            const previewDiv = document.getElementById('sentence-preview');
+            
+            let html = '';
+            for (let i = 0; i < target.length; i++) {
+                if (i < typed.length) {
+                    if (typed[i] === target[i]) {
+                        html += `<span class="char-correct">${target[i]}</span>`;
+                    } else {
+                        html += `<span class="char-incorrect">${target[i]}</span>`;
+                    }
+                } else {
+                    html += `<span class="char-pending">${target[i]}</span>`;
+                }
+            }
+            originalDiv.innerHTML = html;
+            previewDiv.innerText = typed;
+        }
+
+        function renderLongTextTarget(target, typed) {
+            document.getElementById('long-typed-preview').innerText = typed;
+        }
+
+        function updateTargetKeyAndFinger(char) {
+            document.querySelectorAll('.key-cap').forEach(k => k.classList.remove('target-key'));
+            document.querySelectorAll('.finger-outline').forEach(f => f.classList.remove('target-finger'));
+
+            if (!char) return;
+
+            const jamo = getFirstJamo(char);
+            const keyCode = HANGUL_KEY_MAP[jamo] || HANGUL_KEY_MAP[char];
+
+            if (keyCode) {
+                const keyEl = document.querySelector(`[data-key="${keyCode}"]`);
+                if (keyEl) keyEl.classList.add('target-key');
+
+                let matchedFingerId = null;
+                let fingerName = '자유';
+
+                for (const [fingerId, info] of Object.entries(FINGER_MAPPING)) {
+                    if (info.keys.includes(keyCode)) {
+                        matchedFingerId = fingerId;
+                        fingerName = info.name;
+                        break;
+                    }
+                }
+
+                if (matchedFingerId) {
+                    const fingerEl = document.getElementById(matchedFingerId);
+                    if (fingerEl) fingerEl.classList.add('target-finger');
+                }
+
+                document.getElementById('finger-name-tag').innerText = `${fingerName} (${char})`;
+            }
+        }
+
+        function getFirstJamo(char) {
+            const code = char.charCodeAt(0) - 0xAC00;
+            if (code >= 0 && code <= 11172) {
+                const initialIndex = Math.floor(code / 588);
+                const initials = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+                return initials[initialIndex];
+            }
+            return char;
+        }
+
+        function setupKeyboardEvents() {
+            window.addEventListener('keydown', (e) => {
+                const keyEl = document.querySelector(`[data-key="${e.code}"]`);
+                if (keyEl) keyEl.classList.add('active');
+
+                for (const [fingerId, info] of Object.entries(FINGER_MAPPING)) {
+                    if (info.keys.includes(e.code)) {
+                        const fingerEl = document.getElementById(fingerId);
+                        if (fingerEl) fingerEl.classList.add('pressed-finger');
+                    }
+                }
+            });
+
+            window.addEventListener('keyup', (e) => {
+                const keyEl = document.querySelector(`[data-key="${e.code}"]`);
+                if (keyEl) keyEl.classList.remove('active');
+
+                for (const [fingerId, info] of Object.entries(FINGER_MAPPING)) {
+                    if (info.keys.includes(e.code)) {
+                        const fingerEl = document.getElementById(fingerId);
+                        if (fingerEl) fingerEl.classList.remove('pressed-finger');
+                    }
+                }
+            });
+        }
+
+        function updateStats() {
+            if (!startTime) return;
+            const elapsedMinutes = (new Date() - startTime) / 60000;
+            
+            if (elapsedMinutes > 0) {
+                const cpm = Math.round((typedCount * 2.5) / elapsedMinutes);
+                statCpm.innerText = cpm;
+
+                if (cpm > maxCpm) {
+                    maxCpm = cpm;
+                    statMaxCpm.innerText = maxCpm;
+                }
+            }
+
+            const totalInputs = typedCount + errorCount;
+            const accuracy = totalInputs > 0 ? Math.max(0, Math.round((typedCount / totalInputs) * 100)) : 100;
+            statAccuracy.innerText = accuracy;
+        }
+
+        function resetStats() {
+            startTime = null;
+            typedCount = 0;
+            errorCount = 0;
+            statCpm.innerText = '0';
+            statAccuracy.innerText = '100';
+        }
+
+        // Game Engine
+        let gameActive = false;
+        let gameScore = 0;
+        let gameLives = 5;
+        let gameLevel = 1;
+        let gameInterval = null;
+        let activeWords = [];
+        const gameArea = document.getElementById('game-area');
+        const gameInput = document.getElementById('game-input');
+
+        function toggleGame() {
+            if (gameActive) stopGame();
+            else startGame();
+        }
+
+        function startGame() {
+            gameActive = true;
+            gameScore = 0;
+            gameLives = 5;
+            gameLevel = 1;
+            activeWords = [];
+            
+            document.getElementById('game-overlay').classList.add('hidden');
+            document.getElementById('game-start-btn').innerText = '게임 중단';
+            document.getElementById('game-score').innerText = '0';
+            document.getElementById('game-lives').innerText = '❤️❤️❤️❤️❤️';
+            document.getElementById('game-level').innerText = '1';
+            
+            gameInput.disabled = false;
+            gameInput.value = '';
+            gameInput.focus();
+
+            document.querySelectorAll('.falling-word').forEach(e => e.remove());
+
+            let spawnCounter = 0;
+            gameInterval = setInterval(() => {
+                if (!gameActive) return;
+
+                spawnCounter++;
+                if (spawnCounter % Math.max(2, 6 - gameLevel) === 0) {
+                    spawnWord();
+                }
+
+                moveWords();
+            }, 1000 / 30);
+
+            gameInput.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    checkGameWord(gameInput.value.trim());
+                    gameInput.value = '';
+                }
+            };
+        }
+
+        function stopGame() {
+            gameActive = false;
+            clearInterval(gameInterval);
+            document.getElementById('game-overlay').classList.remove('hidden');
+            document.getElementById('game-start-btn').innerText = '게임 시작';
+            gameInput.disabled = true;
+        }
+
+        function spawnWord() {
+            const wordList = [...DATA.word.easy, ...DATA.word.medium];
+            const text = wordList[Math.floor(Math.random() * wordList.length)];
+            
+            const el = document.createElement('div');
+            el.className = 'falling-word bg-sky-600 text-white dark:bg-sky-500 text-xs font-bold shadow-lg';
+            el.innerText = text;
+
+            const maxX = gameArea.clientWidth - 90;
+            const x = Math.floor(Math.random() * Math.max(10, maxX));
+            
+            el.style.left = `${x}px`;
+            el.style.top = '0px';
+
+            gameArea.appendChild(el);
+
+            activeWords.push({
+                element: el,
+                text: text,
+                y: 0,
+                speed: 1 + (gameLevel * 0.4) + Math.random() * 0.5
+            });
+        }
+
+        function moveWords() {
+            const maxY = gameArea.clientHeight - 35;
+
+            for (let i = activeWords.length - 1; i >= 0; i--) {
+                const item = activeWords[i];
+                item.y += item.speed;
+                item.element.style.top = `${item.y}px`;
+
+                if (item.y >= maxY) {
+                    sound.playErrorSound();
+                    item.element.remove();
+                    activeWords.splice(i, 1);
+                    
+                    gameLives--;
+                    updateGameLives();
+
+                    if (gameLives <= 0) {
+                        gameOver();
+                    }
+                }
+            }
+        }
+
+        function checkGameWord(typed) {
+            for (let i = 0; i < activeWords.length; i++) {
+                if (activeWords[i].text === typed) {
+                    sound.playSuccessSound();
+                    activeWords[i].element.remove();
+                    activeWords.splice(i, 1);
+                    
+                    gameScore += 10;
+                    document.getElementById('game-score').innerText = gameScore;
+
+                    if (gameScore % 50 === 0) {
+                        gameLevel++;
+                        document.getElementById('game-level').innerText = gameLevel;
+                    }
+                    return;
+                }
+            }
+            sound.playErrorSound();
+        }
+
+        function updateGameLives() {
+            let hearts = '';
+            for (let i = 0; i < gameLives; i++) hearts += '❤️';
+            document.getElementById('game-lives').innerText = hearts || '💀';
+        }
+
+        function gameOver() {
+            stopGame();
+            alert(`게임 오버!\n최종 점수: ${gameScore}점 (단계: ${gameLevel})`);
+        }
+    </script>
+</body>
+</html>
